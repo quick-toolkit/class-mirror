@@ -20,13 +20,13 @@
  * SOFTWARE.
  */
 
-import { DeclarationMetadata } from '../../metadatas';
+import { DeclarationDecorate } from '../../decorates';
 import { ClassConstructor } from '../../interfaces';
 
 /**
  * @class DeclarationMirror
  */
-export abstract class DeclarationMirror<T extends DeclarationMetadata = any> {
+export abstract class DeclarationMirror<T extends DeclarationDecorate = any> {
   /**
    * metadata collection
    * 元数据集合

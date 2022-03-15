@@ -1,6 +1,6 @@
 {
   "name": "@quick-toolkit/class-mirror",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "mirror is typescript decorator framework.",
   "main": "dist/cjs",
   "types": "dist/types",

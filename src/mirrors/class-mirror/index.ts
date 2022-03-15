@@ -23,7 +23,7 @@
 import { DeclarationMirror } from '../declaration-mirror';
 import { MethodMirror } from '../method-mirror';
 import { PropertyMirror } from '../property-mirror';
-import { ClassMetadata, ParameterMetadata } from '../../metadatas';
+import { ClassDecorate, ParameterDecorate } from '../../decorates';
 import { ClassConstructor } from '../../interfaces';
 import { ParameterMirror } from '../parameter-mirror';
 
@@ -32,14 +32,14 @@ import { ParameterMirror } from '../parameter-mirror';
  * 类映射
  */
 export class ClassMirror<
-  T extends ClassMetadata = any
+  T extends ClassDecorate = any
 > extends DeclarationMirror<T> {
   /**
    * 创建类装饰器
    * @param classMetadata
    * 使用此方法可以创建一个类装饰器 classMetadata 必须继承至 ClassMetadata类.
    */
-  public static createDecorator(classMetadata: ClassMetadata): ClassDecorator {
+  public static createDecorator(classMetadata: ClassDecorate): ClassDecorator {
     return (target): void => {
       // 获取已有的类映射管理器 如果没有则创建一个新的
       const classMirror = ClassMirror.reflect(target);
@@ -162,7 +162,7 @@ export class ClassMirror<
    * 获取指定位置的参数装饰器反射, 不包含父类（基类）.
    * @param index 装饰器位置
    */
-  public getParameter<T extends ParameterMetadata>(
+  public getParameter<T extends ParameterDecorate>(
     index: number
   ): ParameterMirror<T> {
     return this.parameters.get(index) as ParameterMirror<T>;
@@ -173,7 +173,7 @@ export class ClassMirror<
    * @param index
    * @param mirror
    */
-  public setParameter<T extends ParameterMetadata>(
+  public setParameter<T extends ParameterDecorate>(
     index: number,
     mirror: ParameterMirror<T>
   ): Map<number, ParameterMirror<T>> {

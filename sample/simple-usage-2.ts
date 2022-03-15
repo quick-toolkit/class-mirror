@@ -1,4 +1,4 @@
-import { entity, param, property, request } from '../src/decorators';
+import { entity, param, property, request } from './decorators';
 import { SimpleGirl } from './simple-girl';
 import { SimpleBoy } from './simple-boy';
 import { SimpleUsage1 } from './simple-usage-1';

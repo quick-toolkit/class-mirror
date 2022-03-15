@@ -2,7 +2,7 @@
  * property decorator 示例
  */
 
-import { PropertyMirror } from '../../mirrors';
+import { PropertyMirror } from '../../../src';
 import { Metadata, MetadataOption } from './metadata';
 
 /**

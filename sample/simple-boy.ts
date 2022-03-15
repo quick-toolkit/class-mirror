@@ -1,4 +1,4 @@
-import { entity, property } from '../src/decorators';
+import { entity, property } from './decorators';
 import { SimplePerson } from './simple-person';
 
 @entity({ title: 'SimplePerson' })

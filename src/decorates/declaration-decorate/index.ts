@@ -1,7 +1,7 @@
 /**
  * 声明元数据
  */
-export abstract class DeclarationMetadata<T = any> {
+export abstract class DeclarationDecorate<T = any> {
   /**
    * target
    * 元数据目标

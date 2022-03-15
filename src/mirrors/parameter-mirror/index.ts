@@ -23,14 +23,14 @@
 import { DeclarationMirror } from '../declaration-mirror';
 import { ClassMirror } from '../class-mirror';
 import { MethodMirror } from '../method-mirror';
-import { ParameterMetadata } from '../../metadatas';
+import { ParameterDecorate } from '../../decorates';
 
 /**
  * 参数装饰器映射
  * @class ParameterMirror
  */
 export class ParameterMirror<
-  T extends ParameterMetadata = any
+  T extends ParameterDecorate = any
 > extends DeclarationMirror<T> {
   /**
    * 创建装饰器
@@ -38,7 +38,7 @@ export class ParameterMirror<
    * 创建一个参数装饰器， metadata 必须继承至 ParameterMetadata 类.
    */
   public static createDecorator(
-    metadata: ParameterMetadata
+    metadata: ParameterDecorate
   ): ParameterDecorator {
     return (
       target: Object,

@@ -22,7 +22,7 @@
 
 import { DeclarationMirror } from '../declaration-mirror';
 import { ClassMirror } from '../class-mirror';
-import { MethodMetadata, ParameterMetadata } from '../../metadatas';
+import { MethodDecorate, ParameterDecorate } from '../../decorates';
 import { ParameterMirror } from '../parameter-mirror';
 import { ClassConstructor } from '../../interfaces';
 
@@ -31,7 +31,7 @@ import { ClassConstructor } from '../../interfaces';
  * 方法反射
  */
 export class MethodMirror<
-  T extends MethodMetadata = any,
+  T extends MethodDecorate = any,
   D = any
 > extends DeclarationMirror<T> {
   /**
@@ -39,7 +39,7 @@ export class MethodMirror<
    * @param metadata
    * 使用此方法可以创建一个成员方法装饰器, metadata 必须继承至MethodMetadata对象
    */
-  public static createDecorator(metadata: MethodMetadata): MethodDecorator {
+  public static createDecorator(metadata: MethodDecorate): MethodDecorator {
     return <T>(
       target: Object,
       propertyKey: string | symbol,
@@ -212,7 +212,7 @@ export class MethodMirror<
    * 获取指定位置的参数装饰器反射, 不包含父类（基类）.
    * @param index 装饰器位置
    */
-  public getParameter<T extends ParameterMetadata = ParameterMetadata>(
+  public getParameter<T extends ParameterDecorate = ParameterDecorate>(
     index: number
   ): ParameterMirror<T> {
     return this.parameters.get(index) as ParameterMirror<T>;

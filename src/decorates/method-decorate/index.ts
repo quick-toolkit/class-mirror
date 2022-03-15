@@ -1,11 +1,11 @@
-import { DeclarationMetadata } from '../declaration-metadata';
+import { DeclarationDecorate } from '../declaration-decorate';
 import { ClassMirror } from '../../mirrors';
 
 /**
- * @class MethodMetadata
+ * @class MethodDecorate
  * 方法元数据
  */
-export class MethodMetadata<T = any, D = any> extends DeclarationMetadata<T> {
+export class MethodDecorate<T = any, D = any> extends DeclarationDecorate<T> {
   /**
    * classMirror
    * 元数据所属的ClassMirror

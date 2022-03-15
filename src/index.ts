@@ -21,5 +21,5 @@
  */
 
 export * from './mirrors';
-export * from './metadatas';
+export * from './decorates';
 export * from './interfaces';

@@ -1,4 +1,4 @@
-import { entity, param } from '../src/decorators';
+import { entity, param } from './decorators';
 import { SimpleUsage2 } from './simple-usage-2';
 
 @entity({ title: 'SimpleUsage3' })

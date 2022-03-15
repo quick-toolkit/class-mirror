@@ -1,4 +1,4 @@
-import { ClassMirror } from '../../mirrors';
+import { ClassMirror } from '../../../src';
 import { Metadata, MetadataOption } from './metadata';
 
 /**

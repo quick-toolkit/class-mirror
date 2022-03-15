@@ -1,4 +1,4 @@
-import { MethodMirror } from '../../mirrors';
+import { MethodMirror } from '../../../src';
 import { Metadata, MetadataOption } from './metadata';
 
 /**

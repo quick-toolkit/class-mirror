@@ -1,6 +1,6 @@
 import { MethodMirror } from '../src';
-import { request } from '../src/decorators';
-import { entity, param, property } from '../src/decorators';
+import { request } from './decorators';
+import { entity, param, property } from './decorators';
 
 const name = Symbol('test');
 

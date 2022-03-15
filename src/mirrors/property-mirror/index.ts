@@ -22,20 +22,20 @@
 
 import { DeclarationMirror } from '../declaration-mirror';
 import { ClassMirror } from '../class-mirror';
-import { PropertyMetadata } from '../../metadatas';
+import { PropertyDecorate } from '../../decorates';
 import { ClassConstructor } from '../../interfaces';
 
 /**
  * 成员映射
  */
 export class PropertyMirror<
-  T extends PropertyMetadata = any
+  T extends PropertyDecorate = any
 > extends DeclarationMirror<T> {
   /**
    * 创建成员装饰器
    * @param metadata
    */
-  public static createDecorator(metadata: PropertyMetadata): PropertyDecorator {
+  public static createDecorator(metadata: PropertyDecorate): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {
       const isStatic: boolean = ClassMirror.isStaticMember(target, propertyKey);
       // 获取已有的类映射管理器 如果没有则创建一个新的
