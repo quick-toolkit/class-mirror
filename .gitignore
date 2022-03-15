@@ -112,3 +112,6 @@ dist
 
 #Hide lock file
 yarn.lock
+
+#Hide docs
+docs/
