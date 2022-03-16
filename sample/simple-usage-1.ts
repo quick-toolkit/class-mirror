@@ -28,6 +28,20 @@ export class SimpleUsage1 {
   @property
   public static test: string;
 
+  @property
+  public static aa: string;
+
+  /**
+   * xx
+   */
+  @request({
+    path: '/info',
+    method: 'post',
+  })
+  public static ax(): void {
+    return;
+  }
+
   /**
    * 测试
    */

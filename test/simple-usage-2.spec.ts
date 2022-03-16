@@ -31,9 +31,9 @@ describe('simple-usage-2.spec.ts', () => {
 
     if (propertyMirror) {
       // 包含父类的一个装饰器 总共两个装饰器
-      expect(propertyMirror.getAllMetadata().length).eq(2);
+      expect(propertyMirror.getAllDecorates().length).eq(2);
       // 不包含父类 所以只有一个装饰器
-      expect(propertyMirror.metadata.size).eq(1);
+      expect(propertyMirror.decorates.size).eq(1);
     }
   });
 
@@ -42,10 +42,10 @@ describe('simple-usage-2.spec.ts', () => {
 
     if (methodMirror) {
       // 不包含父类 只有一个
-      expect(methodMirror.metadata.size).eq(1);
+      expect(methodMirror.decorates.size).eq(1);
 
       // 包含父类的装饰器 总共2个
-      expect(methodMirror.getAllMetadata().length).eq(2);
+      expect(methodMirror.getAllDecorates().length).eq(2);
 
       // 该函数的返回值为String
       expect(methodMirror.getReturnType()).eq(String);
@@ -62,10 +62,10 @@ describe('simple-usage-2.spec.ts', () => {
 
     if (methodMirror1) {
       // 此方法只有一个装饰器
-      expect(methodMirror1.metadata.size).eq(1);
+      expect(methodMirror1.decorates.size).eq(1);
       // 此方法是静态方法，就算父类有相同的静态方法，allMetadata 也不会包含父类的元数据
-      expect(methodMirror1.getAllMetadata().length).eq(
-        methodMirror1.metadata.size
+      expect(methodMirror1.getAllDecorates().length).eq(
+        methodMirror1.decorates.size
       );
     }
   });

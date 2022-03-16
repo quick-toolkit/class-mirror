@@ -34,11 +34,11 @@ export class ParameterMirror<
 > extends DeclarationMirror<T> {
   /**
    * 创建装饰器
-   * @param metadata 元数据对象
-   * 创建一个参数装饰器， metadata 必须继承至 ParameterMetadata 类.
+   * @param decorate 元数据对象
+   * 创建一个参数装饰器， metadata 必须继承至 ParameterDecorate 类.
    */
   public static createDecorator(
-    metadata: ParameterDecorate
+    decorate: ParameterDecorate
   ): ParameterDecorator {
     return (
       target: Object,
@@ -60,7 +60,7 @@ export class ParameterMirror<
         parameterMirror.propertyKey = null;
         parameterMirror.methodMirror = null;
 
-        parameterMirror.metadata.add(metadata);
+        parameterMirror.decorates.add(decorate);
         classMirror.setParameter(parameterIndex, parameterMirror);
 
         // 定义类元数据
@@ -104,14 +104,14 @@ export class ParameterMirror<
         methodMirror.getParameter(parameterIndex) || new ParameterMirror();
 
       // 元数据关联
-      metadata.target = target;
-      metadata.classMirror = classMirror;
-      metadata.methodMirror = methodMirror;
-      metadata.propertyKey = propertyKey;
-      metadata.index = parameterIndex;
+      decorate.target = target;
+      decorate.classMirror = classMirror;
+      decorate.methodMirror = methodMirror;
+      decorate.propertyKey = propertyKey;
+      decorate.index = parameterIndex;
 
       // 添加元数据
-      parameterMirror.metadata.add(metadata);
+      parameterMirror.decorates.add(decorate);
 
       // 设置基本信息
       parameterMirror.target = target;

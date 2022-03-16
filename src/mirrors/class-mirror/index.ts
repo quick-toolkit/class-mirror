@@ -37,7 +37,7 @@ export class ClassMirror<
   /**
    * 创建类装饰器
    * @param classMetadata
-   * 使用此方法可以创建一个类装饰器 classMetadata 必须继承至 ClassMetadata类.
+   * 使用此方法可以创建一个类装饰器 ClassDecorate 必须继承至 ClassDecorate类.
    */
   public static createDecorator(classMetadata: ClassDecorate): ClassDecorator {
     return (target): void => {
@@ -46,7 +46,7 @@ export class ClassMirror<
       classMirror.target = target;
       classMetadata.target = target;
       classMetadata.classMirror = classMirror;
-      classMirror.metadata.add(classMetadata);
+      classMirror.decorates.add(classMetadata);
 
       // 反向映射实例
       Reflect.defineMetadata(classMetadata, classMirror, target);
@@ -86,16 +86,17 @@ export class ClassMirror<
     target: T,
     propertyKey: string | symbol
   ): boolean {
+    return target.constructor === Function;
     // 如果是class constructor === Function
-    if (target.constructor === Function) {
-      return (
-        Object.getOwnPropertyNames(target).includes(propertyKey as any) ||
-        Object.getOwnPropertySymbols(target).includes(propertyKey as any)
-      );
-    } else if ((target as any).prototype) {
-      return ClassMirror.isStaticMember((target as any).prototype, propertyKey);
-    }
-    return false;
+    // if (target.constructor === Function) {
+    //   return (
+    //     Object.getOwnPropertyNames(target).includes(propertyKey as any) ||
+    //     Object.getOwnPropertySymbols(target).includes(propertyKey as any)
+    //   );
+    // } else if ((target as any).prototype) {
+    //   return ClassMirror.isStaticMember((target as any).prototype, propertyKey);
+    // }
+    // return false;
   }
 
   /**
@@ -131,24 +132,24 @@ export class ClassMirror<
   /**
    * 获取所有元数据 包含父类
    */
-  public getAllMetadata<M extends T = T>(type?: ClassConstructor<M>): M[] {
-    const metadataList = this.getMetadata(type);
+  public getAllDecorates<M extends T = T>(type?: ClassConstructor<M>): M[] {
+    const decorates = this.getDecorates(type);
     if (this.parentClassMirror) {
-      return metadataList.concat(this.parentClassMirror.getAllMetadata());
+      return decorates.concat(this.parentClassMirror.getAllDecorates());
     }
-    return metadataList;
+    return decorates;
   }
 
   /**
    * 获取元数据集合
    * @param type 类型, 参数继承至 `ClassMetadata`。
    */
-  public getMetadata<M extends T = T>(type?: ClassConstructor<M>): M[] {
-    const metadataList = Array.from<any>(this.metadata.values());
+  public getDecorates<M extends T = T>(type?: ClassConstructor<M>): M[] {
+    const decorates = Array.from<any>(this.decorates.values());
     if (type) {
-      return metadataList.filter((o) => o instanceof type) as M[];
+      return decorates.filter((o) => o instanceof type) as M[];
     }
-    return metadataList as M[];
+    return decorates as M[];
   }
 
   /**

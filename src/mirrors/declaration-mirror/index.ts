@@ -31,7 +31,7 @@ export abstract class DeclarationMirror<T extends DeclarationDecorate = any> {
    * metadata collection
    * 元数据集合
    */
-  public readonly metadata: Set<T> = new Set();
+  public readonly decorates: Set<T> = new Set();
 
   /**
    * target
@@ -41,13 +41,13 @@ export abstract class DeclarationMirror<T extends DeclarationDecorate = any> {
 
   /**
    * 获取元数据集合 不包含父类
-   * @param type 类型, 参数继承至 `MethodMetadata`。
+   * @param type 类型, 参数继承至 `DeclarationDecorate`。
    */
-  public getMetadata<M extends T = T>(type?: ClassConstructor<M>): M[] {
-    const metadataList = Array.from<any>(this.metadata.values());
+  public getDecorates<M extends T = T>(type?: ClassConstructor<M>): M[] {
+    const decorates = Array.from<any>(this.decorates.values());
     if (type) {
-      return metadataList.filter((o) => o instanceof type) as M[];
+      return decorates.filter((o) => o instanceof type) as M[];
     }
-    return metadataList as M[];
+    return decorates as M[];
   }
 }

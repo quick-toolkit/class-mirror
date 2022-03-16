@@ -16,14 +16,14 @@ describe('simple-usage-1.spec.ts', () => {
 
     expect(propertiesMirrors.size).eq(2);
     expect(propertiesMirrorsFromAll.size).eq(2);
-    expect(staticPropertiesMirrors.size).eq(1);
+    expect(staticPropertiesMirrors.size).eq(2);
 
     // 方法
     const methodMirrors = classMirror.getMethods();
     const staticMethodMirrors = classMirror.getStaticMethods();
     const methodMirrorsFromAll = classMirror.getAllMethods();
     expect(methodMirrors.size).eq(3);
-    expect(staticMethodMirrors.size).eq(3);
+    expect(staticMethodMirrors.size).eq(4);
     expect(methodMirrorsFromAll.size).eq(3);
 
     // 因为构造函数未使用参数装饰器 所以是0
@@ -36,9 +36,9 @@ describe('simple-usage-1.spec.ts', () => {
 
     if (propertyMirror) {
       // 获取当前类中指定成员的元数据数量
-      expect(propertyMirror.metadata.size).eq(1);
+      expect(propertyMirror.decorates.size).eq(1);
       // 获取指定成员的元数据数量 包含父类
-      expect(propertyMirror.getAllMetadata().length).eq(1);
+      expect(propertyMirror.getAllDecorates().length).eq(1);
     }
   });
 });

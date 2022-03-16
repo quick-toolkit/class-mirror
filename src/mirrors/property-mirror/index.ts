@@ -33,9 +33,9 @@ export class PropertyMirror<
 > extends DeclarationMirror<T> {
   /**
    * 创建成员装饰器
-   * @param metadata
+   * @param decorate
    */
-  public static createDecorator(metadata: PropertyDecorate): PropertyDecorator {
+  public static createDecorator(decorate: PropertyDecorate): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {
       const isStatic: boolean = ClassMirror.isStaticMember(target, propertyKey);
       // 获取已有的类映射管理器 如果没有则创建一个新的
@@ -56,11 +56,11 @@ export class PropertyMirror<
       propertyMirror.target = target;
 
       // 元数据关联
-      metadata.propertyKey = propertyKey;
-      metadata.target = target;
-      metadata.classMirror = classMirror;
+      decorate.propertyKey = propertyKey;
+      decorate.target = target;
+      decorate.classMirror = classMirror;
 
-      propertyMirror.metadata.add(metadata);
+      propertyMirror.decorates.add(decorate);
 
       // 设置元数据
       classMirror.setMirror(propertyKey, propertyMirror, isStatic);
@@ -124,16 +124,16 @@ export class PropertyMirror<
    * 获取所有元数据 包含父类
    * @param type 类型, 参数继承至 `MethodMetadata`。
    */
-  public getAllMetadata<M extends T = T>(type?: ClassConstructor<M>): M[] {
+  public getAllDecorates<M extends T = T>(type?: ClassConstructor<M>): M[] {
     if (this.isStatic) {
-      return this.getMetadata(type);
+      return this.getDecorates(type);
     }
     const list: M[] = [];
     this.classMirror
       .getAllMirrors<PropertyMirror<M>>(PropertyMirror)
       .forEach((o) => {
         if (o.propertyKey === this.propertyKey) {
-          const metadata = o.getMetadata(type);
+          const metadata = o.getDecorates(type);
           list.push(...metadata);
         }
       });

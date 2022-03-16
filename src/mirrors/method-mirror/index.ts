@@ -36,10 +36,10 @@ export class MethodMirror<
 > extends DeclarationMirror<T> {
   /**
    * 创建方法装饰器
-   * @param metadata
-   * 使用此方法可以创建一个成员方法装饰器, metadata 必须继承至MethodMetadata对象
+   * @param decorate
+   * 使用此方法可以创建一个成员方法装饰器, metadata 必须继承至MethodDecorate对象
    */
-  public static createDecorator(metadata: MethodDecorate): MethodDecorator {
+  public static createDecorator(decorate: MethodDecorate): MethodDecorator {
     return <T>(
       target: Object,
       propertyKey: string | symbol,
@@ -47,7 +47,6 @@ export class MethodMirror<
     ): TypedPropertyDescriptor<T> => {
       // 是类
       const isStatic: boolean = ClassMirror.isStaticMember(target, propertyKey);
-
       const classMirror = ClassMirror.reflect(
         isStatic ? (target as Function) : target.constructor
       );
@@ -67,20 +66,20 @@ export class MethodMirror<
       methodMirror.target = target;
 
       // metadata信息设置
-      metadata.classMirror = classMirror;
-      metadata.propertyKey = propertyKey;
-      metadata.descriptor = descriptor;
-      metadata.target = target;
+      decorate.classMirror = classMirror;
+      decorate.propertyKey = propertyKey;
+      decorate.descriptor = descriptor;
+      decorate.target = target;
 
       // 反向映射元数据至 MethodMirror
       Reflect.defineMetadata(
-        metadata,
+        decorate,
         methodMirror,
         isStatic ? target : target.constructor
       );
 
       // 设置元数据
-      methodMirror.metadata.add(metadata);
+      methodMirror.decorates.add(decorate);
 
       // 添加mirror
       classMirror.setMirror(propertyKey, methodMirror, isStatic);
@@ -185,16 +184,16 @@ export class MethodMirror<
    * 获取所有元数据 包含父类
    * @param type 类型, 参数继承至 `MethodMetadata`。
    */
-  public getAllMetadata<M extends T = T>(type?: ClassConstructor<M>): M[] {
+  public getAllDecorates<M extends T = T>(type?: ClassConstructor<M>): M[] {
     if (this.isStatic) {
-      return this.getMetadata(type);
+      return this.getDecorates(type);
     }
     const list: M[] = [];
     this.classMirror
       .getAllMirrors<MethodMirror<M>>(MethodMirror)
       .forEach((o) => {
         if (o.propertyKey === this.propertyKey) {
-          const metadata = o.getMetadata(type);
+          const metadata = o.getDecorates(type);
           list.push(...metadata);
         }
       });
