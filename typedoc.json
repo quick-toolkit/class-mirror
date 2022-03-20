@@ -1,6 +1,6 @@
 {
   "entryPoints": ["./src/index.ts"],
-  "name": "Class Decorator API",
+  "name": "ClassMirror API",
   "hideGenerator": true,
   "includeVersion": true
 }
