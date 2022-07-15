@@ -75,7 +75,7 @@ export class ParameterMirror<
         return;
       }
 
-      const isStatic: boolean = ClassMirror.isStaticMember(target, propertyKey);
+      const isStatic: boolean = ClassMirror.isStaticMember(target);
 
       const classMirror = ClassMirror.reflect(
         isStatic || isConstructor ? (target as Function) : target.constructor

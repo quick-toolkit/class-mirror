@@ -46,7 +46,7 @@ export class MethodMirror<
       descriptor: TypedPropertyDescriptor<T>
     ): TypedPropertyDescriptor<T> => {
       // 是类
-      const isStatic: boolean = ClassMirror.isStaticMember(target, propertyKey);
+      const isStatic: boolean = ClassMirror.isStaticMember(target);
       const classMirror = ClassMirror.reflect(
         isStatic ? (target as Function) : target.constructor
       );
@@ -166,7 +166,7 @@ export class MethodMirror<
    * parameters
    * 当前Mirror的所有参数ParameterMirror集合
    */
-  private parameters: Map<number, ParameterMirror> = new Map();
+  private readonly parameters: Map<number, ParameterMirror> = new Map();
 
   /**
    * descriptor

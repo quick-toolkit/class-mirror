@@ -36,20 +36,19 @@ export class ClassMirror<
 > extends DeclarationMirror<T> {
   /**
    * 创建类装饰器
-   * @param classMetadata
-   * 使用此方法可以创建一个类装饰器 ClassDecorate 必须继承至 ClassDecorate类.
+   * @param classDecorate
+   * 使用此方法可以创建一个类装饰器
    */
-  public static createDecorator(classMetadata: ClassDecorate): ClassDecorator {
+  public static createDecorator(classDecorate: ClassDecorate): ClassDecorator {
     return (target): void => {
       // 获取已有的类映射管理器 如果没有则创建一个新的
       const classMirror = ClassMirror.reflect(target);
       classMirror.target = target;
-      classMetadata.target = target;
-      classMetadata.classMirror = classMirror;
-      classMirror.decorates.add(classMetadata);
-
+      classDecorate.target = target;
+      classDecorate.classMirror = classMirror;
+      classMirror.decorates.add(classDecorate);
       // 反向映射实例
-      Reflect.defineMetadata(classMetadata, classMirror, target);
+      Reflect.defineMetadata(classDecorate, classMirror, target);
       // 定义元数据
       Reflect.defineMetadata(ClassMirror, classMirror, target);
     };
@@ -58,7 +57,7 @@ export class ClassMirror<
   /**
    * 获取映射数据
    * @param type
-   * 使用此方法可以获取指定类型 type类上的 ClassMirror实例.
+   * 使用此方法可以获取指定`type`上的 ClassMirror实例.
    */
   public static reflect<T extends Function>(type: T): ClassMirror {
     const metadata = Reflect.getMetadata(
@@ -70,7 +69,7 @@ export class ClassMirror<
         return metadata;
       } else {
         const classMirror = new ClassMirror();
-        classMirror.parentClassMirror = metadata;
+        classMirror.parent = metadata;
         return classMirror;
       }
     }
@@ -78,38 +77,24 @@ export class ClassMirror<
   }
 
   /**
-   * 判断target的静态成员中是否包含propertyKey
+   * 判断是否为静态成员
    * @param target
-   * @param propertyKey
    */
-  public static isStaticMember<T extends Object>(
-    target: T,
-    propertyKey: string | symbol
-  ): boolean {
+  public static isStaticMember<T extends Object>(target: T): boolean {
     return target.constructor === Function;
-    // 如果是class constructor === Function
-    // if (target.constructor === Function) {
-    //   return (
-    //     Object.getOwnPropertyNames(target).includes(propertyKey as any) ||
-    //     Object.getOwnPropertySymbols(target).includes(propertyKey as any)
-    //   );
-    // } else if ((target as any).prototype) {
-    //   return ClassMirror.isStaticMember((target as any).prototype, propertyKey);
-    // }
-    // return false;
   }
+
+  /**
+   * 父ClassMirror
+   */
+  public parent: ClassMirror | null = null;
 
   /**
    * 构造函数参数
    * 此处的`parameters.size`数量是构造函数使用了`ParameterMirror.createDecorator`创建的装饰的成员数量,
    * 要获取所有参数的数量，请使用方法 `[new ClassMirror].getDesignParamTypes`.
    */
-  private parameters: Map<number, ParameterMirror> = new Map();
-
-  /**
-   * 父ClassMirror
-   */
-  public parentClassMirror: ClassMirror | null = null;
+  private readonly parameters: Map<number, ParameterMirror> = new Map();
 
   /**
    * Static members
@@ -134,8 +119,8 @@ export class ClassMirror<
    */
   public getAllDecorates<M extends T = T>(type?: ClassConstructor<M>): M[] {
     const decorates = this.getDecorates(type);
-    if (this.parentClassMirror) {
-      return decorates.concat(this.parentClassMirror.getAllDecorates());
+    if (this.parent) {
+      return decorates.concat(this.parent.getAllDecorates());
     }
     return decorates;
   }
@@ -192,20 +177,21 @@ export class ClassMirror<
   }
 
   /**
-   * 获取所有静态方法成员
-   * @param type 参数必须继承 `MethodMirror`
+   *
+   * @param propertyKey
    */
-  public getStaticMethods<T extends MethodMirror = MethodMirror>(
-    type?: ClassConstructor<T>
-  ): Map<PropertyKey, T> {
-    const map = new Map<PropertyKey, T>();
+  public getStaticMethod(propertyKey: PropertyKey): MethodMirror | undefined {
+    return this.getStaticMethods().get(propertyKey);
+  }
+
+  /**
+   * 获取所有静态方法成员
+   */
+  public getStaticMethods(): Map<PropertyKey, MethodMirror> {
+    const map = new Map<PropertyKey, MethodMirror>();
     this.staticMembers.forEach((value, key) => {
-      if (type) {
-        if (value instanceof type) {
-          map.set(key, value);
-        }
-      } else if (value instanceof MethodMirror) {
-        map.set(key, value as T);
+      if (value instanceof MethodMirror) {
+        map.set(key, value);
       }
     });
     return map;
@@ -213,82 +199,62 @@ export class ClassMirror<
 
   /**
    * 获取所有静态属性成员
-   * @param type 参数必须继承 `PropertyMirror`
    */
-  public getStaticProperties<T extends PropertyMirror = PropertyMirror>(
-    type?: ClassConstructor<T>
-  ): Map<PropertyKey, T> {
-    const map = new Map<PropertyKey, T>();
+  public getStaticProperties(): Map<PropertyKey, PropertyMirror> {
+    const map = new Map<PropertyKey, PropertyMirror>();
     this.staticMembers.forEach((value, key) => {
-      if (type) {
-        if (value instanceof type) {
-          map.set(key, value);
-        }
-      } else if (value instanceof PropertyMirror) {
-        map.set(key, value as T);
+      if (value instanceof PropertyMirror) {
+        map.set(key, value);
       }
     });
     return map;
   }
 
   /**
-   * 获取所有实例方法成员 含父类（基类）中的实例成员
-   * @param type 参数必须继承 `MethodMirror`
+   * 获取所有实例方法成员 含父类（基类）中的实例成员方法
    */
-  public getAllMethods<T extends MethodMirror = MethodMirror>(
-    type?: ClassConstructor<T>
-  ): Map<PropertyKey, T> {
-    const map = new Map<PropertyKey, T>();
+  public getAllMethods(): Map<PropertyKey, MethodMirror> {
+    const map = new Map<PropertyKey, MethodMirror>();
     const instanceMembers = this.getAllInstanceMembers();
     instanceMembers.forEach((value, key) => {
-      if (type) {
-        if (value instanceof type) {
-          map.set(key, value);
-        }
-      } else if (value instanceof MethodMirror) {
-        map.set(key, value as T);
+      if (value instanceof MethodMirror) {
+        map.set(key, value);
       }
     });
     return map;
   }
 
   /**
-   * 获取所有实例方法成员 不含父类（基类）中的实例成员
-   * @param type 参数必须继承 `MethodMirror`
+   * 获取所有实例方法成员 不含父类（基类）中的实例成员方法
    */
-  public getMethods<T extends MethodMirror = MethodMirror>(
-    type?: ClassConstructor<T>
-  ): Map<PropertyKey, T> {
-    const map = new Map<PropertyKey, T>();
+  public getMethods(): Map<PropertyKey, MethodMirror> {
+    const map = new Map<PropertyKey, MethodMirror>();
     const instanceMembers = this.getInstanceMembers();
     instanceMembers.forEach((value, key) => {
-      if (type) {
-        if (value instanceof type) {
-          map.set(key, value);
-        }
-      } else if (value instanceof MethodMirror) {
-        map.set(key, value as T);
+      if (value instanceof MethodMirror) {
+        map.set(key, value);
       }
     });
     return map;
+  }
+
+  /**
+   * 获取含父类（基类）中指定 `propertyKey` 的实例成员方法
+   * @param propertyKey
+   */
+  public getMethod(propertyKey: PropertyKey): MethodMirror | undefined {
+    return this.getAllMethods().get(propertyKey);
   }
 
   /**
    * 获取所有实例成员 含父类（基类）中的实例成员
-   * @param type 参数必须继承 `PropertyMirror`
    */
-  public getAllProperties<T extends PropertyMirror = PropertyMirror>(
-    type?: ClassConstructor<T>
-  ): Map<PropertyKey, T> {
-    const map = new Map<PropertyKey, T>();
+  public getAllProperties(): Map<PropertyKey, PropertyMirror> {
+    const map = new Map<PropertyKey, PropertyMirror>();
     const instanceMembers = this.getAllInstanceMembers();
     instanceMembers.forEach((value, key) => {
-      if (type) {
-        if (value instanceof type) {
-          map.set(key, value);
-        }
-      } else if (value instanceof PropertyMirror) {
-        map.set(key, value as T);
+      if (value instanceof PropertyMirror) {
+        map.set(key, value);
       }
     });
     return map;
@@ -296,23 +262,24 @@ export class ClassMirror<
 
   /**
    * 获取所有实例属性成员 不含父类（基类）中的实例成员
-   * @param type 参数必须继承 `PropertyMirror`
    */
-  public getProperties<T extends PropertyMirror = PropertyMirror>(
-    type?: ClassConstructor<T>
-  ): Map<PropertyKey, T> {
-    const map = new Map<PropertyKey, T>();
+  public getProperties(): Map<PropertyKey, PropertyMirror> {
+    const map = new Map<PropertyKey, PropertyMirror>();
     const instanceMembers = this.getInstanceMembers();
     instanceMembers.forEach((value, key) => {
-      if (type) {
-        if (value instanceof type) {
-          map.set(key, value);
-        }
-      } else if (value instanceof PropertyMirror) {
-        map.set(key, value as T);
+      if (value instanceof PropertyMirror) {
+        map.set(key, value);
       }
     });
     return map;
+  }
+
+  /**
+   * 获取含父类（基类）中指定 `propertyKey` 的实例成员
+   * @param propertyKey
+   */
+  public getProperty(propertyKey: PropertyKey): PropertyMirror | undefined {
+    return this.getAllProperties().get(propertyKey);
   }
 
   /**
@@ -322,8 +289,8 @@ export class ClassMirror<
     PropertyKey,
     MethodMirror | PropertyMirror
   > {
-    if (this.parentClassMirror) {
-      const instanceMembers = this.parentClassMirror.getAllInstanceMembers();
+    if (this.parent) {
+      const instanceMembers = this.parent.getAllInstanceMembers();
       this.instanceMembers.forEach((value, key) =>
         instanceMembers.set(key, value)
       );
@@ -363,11 +330,8 @@ export class ClassMirror<
     T extends PropertyMirror | MethodMirror = PropertyMirror | MethodMirror
   >(type: ClassConstructor<T> | undefined, isStatic = false): T[] {
     const currentMirrors = this.getMirrors(type, isStatic);
-    if (this.parentClassMirror) {
-      const parentClassMirrors = this.parentClassMirror.getAllMirrors(
-        type,
-        isStatic
-      );
+    if (this.parent) {
+      const parentClassMirrors = this.parent.getAllMirrors(type, isStatic);
       return parentClassMirrors.concat(currentMirrors);
     }
     return currentMirrors;

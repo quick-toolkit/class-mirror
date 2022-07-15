@@ -38,7 +38,7 @@ export class MethodDecorate<T = any, D = any> extends DeclarationDecorate<T> {
    * propertyKey
    * 元数据的key名称
    */
-  public propertyKey: string | symbol;
+  public propertyKey: PropertyKey;
 
   /**
    * descriptor
