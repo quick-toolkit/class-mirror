@@ -43,7 +43,7 @@ export class ParameterDecorate<T = any> extends DeclarationDecorate<T> {
    * propertyKey
    * 元数据所属的 key 名称
    */
-  public propertyKey: string | symbol;
+  public propertyKey: PropertyKey;
 
   /**
    * index
