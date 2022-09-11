@@ -39,7 +39,9 @@ export class MethodMirror<
    * @param decorate
    * 使用此方法可以创建一个成员方法装饰器, metadata 必须继承至MethodDecorate对象
    */
-  public static createDecorator(decorate: MethodDecorate): MethodDecorator {
+  public static createDecorator(
+    decorate: MethodDecorate | MethodDecorateFactory
+  ): MethodDecorator {
     return <T>(
       target: Object,
       propertyKey: string | symbol,
@@ -64,6 +66,10 @@ export class MethodMirror<
       methodMirror.propertyKey = propertyKey;
       methodMirror.descriptor = descriptor;
       methodMirror.target = target;
+
+      if (typeof decorate === 'function') {
+        decorate = decorate(classMirror.target, propertyKey, descriptor);
+      }
 
       // metadata信息设置
       decorate.classMirror = classMirror;
@@ -253,3 +259,9 @@ export class MethodMirror<
     ) as Function;
   }
 }
+
+export type MethodDecorateFactory = <T extends MethodDecorate>(
+  target: Object,
+  propertyKey: string | symbol,
+  descriptor: TypedPropertyDescriptor<any>
+) => T;

@@ -38,7 +38,7 @@ export class ParameterMirror<
    * 创建一个参数装饰器， metadata 必须继承至 ParameterDecorate 类.
    */
   public static createDecorator(
-    decorate: ParameterDecorate
+    decorate: ParameterDecorate | ParameterDecorateFactory
   ): ParameterDecorator {
     return (
       target: Object,
@@ -59,6 +59,10 @@ export class ParameterMirror<
         parameterMirror.target = target;
         parameterMirror.propertyKey = null;
         parameterMirror.methodMirror = null;
+
+        if (typeof decorate === 'function') {
+          decorate = decorate(classMirror.target, propertyKey, parameterIndex);
+        }
 
         parameterMirror.decorates.add(decorate);
         classMirror.setParameter(parameterIndex, parameterMirror);
@@ -102,6 +106,10 @@ export class ParameterMirror<
       // 查找参数
       const parameterMirror =
         methodMirror.getParameter(parameterIndex) || new ParameterMirror();
+
+      if (typeof decorate === 'function') {
+        decorate = decorate(classMirror.target, propertyKey, parameterIndex);
+      }
 
       // 元数据关联
       decorate.target = target;
@@ -238,3 +246,9 @@ export class ParameterMirror<
     }
   }
 }
+
+export type ParameterDecorateFactory = <T extends ParameterDecorate>(
+  target: Object,
+  propertyKey: string | symbol,
+  parameterIndex: number
+) => T;

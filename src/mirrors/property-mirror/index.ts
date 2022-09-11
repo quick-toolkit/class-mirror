@@ -35,7 +35,9 @@ export class PropertyMirror<
    * 创建成员装饰器
    * @param decorate
    */
-  public static createDecorator(decorate: PropertyDecorate): PropertyDecorator {
+  public static createDecorator(
+    decorate: PropertyDecorate | PropertyDecorateFactory
+  ): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {
       const isStatic: boolean = ClassMirror.isStaticMember(target);
       // 获取已有的类映射管理器 如果没有则创建一个新的
@@ -54,6 +56,10 @@ export class PropertyMirror<
       propertyMirror.isStatic = isStatic;
       propertyMirror.classMirror = classMirror;
       propertyMirror.target = target;
+
+      if (typeof decorate === 'function') {
+        decorate = decorate(classMirror.target, propertyKey);
+      }
 
       // 元数据关联
       decorate.propertyKey = propertyKey;
@@ -151,3 +157,8 @@ export class PropertyMirror<
     ) as T;
   }
 }
+
+export type PropertyDecorateFactory = <T extends PropertyDecorate>(
+  target: Object,
+  propertyKey: string | symbol
+) => T;

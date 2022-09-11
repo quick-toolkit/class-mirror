@@ -39,11 +39,16 @@ export class ClassMirror<
    * @param classDecorate
    * 使用此方法可以创建一个类装饰器
    */
-  public static createDecorator(classDecorate: ClassDecorate): ClassDecorator {
+  public static createDecorator(
+    classDecorate: ClassDecorate | ClassDecorateFactory
+  ): ClassDecorator {
     return (target): void => {
       // 获取已有的类映射管理器 如果没有则创建一个新的
       const classMirror = ClassMirror.reflect(target);
       classMirror.target = target;
+      if (typeof classDecorate === 'function') {
+        classDecorate = classDecorate(target);
+      }
       classDecorate.target = target;
       classDecorate.classMirror = classMirror;
       classMirror.decorates.add(classDecorate);
@@ -392,3 +397,10 @@ export class ClassMirror<
     }
   }
 }
+
+export type ClassDecorateFactory = <
+  T extends ClassDecorate,
+  TFunction extends Function
+>(
+  target: TFunction
+) => T;
