@@ -366,7 +366,7 @@ parameterMirror4.getDesignParamType(); // Number
 ```
 
 ## Documentation
-- [ApiDocs](https://quick-toolkit.github.io/mirror/)
+- [ApiDocs](https://quick-toolkit.github.io/class-mirror/)
 - [samples](https://github.com/quick-toolkit/class-mirror/tree/master/sample)
 
 
