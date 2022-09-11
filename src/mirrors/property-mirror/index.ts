@@ -36,7 +36,7 @@ export class PropertyMirror<
    * @param decorate
    */
   public static createDecorator(
-    decorate: PropertyDecorate | PropertyDecorateFactory
+    decorate: PropertyDecorate | PropertyDecorateFactory<PropertyDecorate>
   ): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {
       const isStatic: boolean = ClassMirror.isStaticMember(target);
@@ -158,7 +158,7 @@ export class PropertyMirror<
   }
 }
 
-export type PropertyDecorateFactory = <T extends PropertyDecorate>(
+export type PropertyDecorateFactory<T extends PropertyDecorate> = (
   target: Object,
   propertyKey: string | symbol
 ) => T;

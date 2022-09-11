@@ -40,7 +40,7 @@ export class MethodMirror<
    * 使用此方法可以创建一个成员方法装饰器, metadata 必须继承至MethodDecorate对象
    */
   public static createDecorator(
-    decorate: MethodDecorate | MethodDecorateFactory
+    decorate: MethodDecorate | MethodDecorateFactory<MethodDecorate>
   ): MethodDecorator {
     return <T>(
       target: Object,
@@ -260,7 +260,7 @@ export class MethodMirror<
   }
 }
 
-export type MethodDecorateFactory = <T extends MethodDecorate>(
+export type MethodDecorateFactory<T extends MethodDecorate> = (
   target: Object,
   propertyKey: string | symbol,
   descriptor: TypedPropertyDescriptor<any>

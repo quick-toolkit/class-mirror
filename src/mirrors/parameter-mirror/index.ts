@@ -38,7 +38,7 @@ export class ParameterMirror<
    * 创建一个参数装饰器， metadata 必须继承至 ParameterDecorate 类.
    */
   public static createDecorator(
-    decorate: ParameterDecorate | ParameterDecorateFactory
+    decorate: ParameterDecorate | ParameterDecorateFactory<ParameterDecorate>
   ): ParameterDecorator {
     return (
       target: Object,
@@ -247,7 +247,7 @@ export class ParameterMirror<
   }
 }
 
-export type ParameterDecorateFactory = <T extends ParameterDecorate>(
+export type ParameterDecorateFactory<T extends ParameterDecorate> = (
   target: Object,
   propertyKey: string | symbol,
   parameterIndex: number
