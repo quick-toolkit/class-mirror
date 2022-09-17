@@ -148,17 +148,19 @@ export class ClassMirror<
   public getParameters(): Map<number, ParameterMirror> {
     if (this.parameters.size === 0) {
       const designParamTypes = this.getDesignParamTypes();
-      const map = new Map<number, ParameterMirror>();
-      designParamTypes.forEach((v, i) => {
-        const parameterMirror = new ParameterMirror();
-        parameterMirror.classMirror = this;
-        parameterMirror.index = i;
-        parameterMirror.target = this.target;
-        parameterMirror.propertyKey = null;
-        parameterMirror.methodMirror = null;
-        map.set(i, parameterMirror);
-      });
-      return map;
+      if (Array.isArray(designParamTypes)) {
+        const map = new Map<number, ParameterMirror>();
+        designParamTypes.forEach((v, i) => {
+          const parameterMirror = new ParameterMirror();
+          parameterMirror.classMirror = this;
+          parameterMirror.index = i;
+          parameterMirror.target = this.target;
+          parameterMirror.propertyKey = null;
+          parameterMirror.methodMirror = null;
+          map.set(i, parameterMirror);
+        });
+        return map;
+      }
     }
     return new Map(this.parameters.entries());
   }
