@@ -210,6 +210,22 @@ export class MethodMirror<
    * 获取所有参数装饰器
    */
   public getParameters(): Map<number, ParameterMirror> {
+    if (this.parameters.size === 0) {
+      const designParamTypes = this.getDesignParamTypes();
+      if (Array.isArray(designParamTypes)) {
+        const map = new Map<number, ParameterMirror>();
+        designParamTypes.forEach((v, i) => {
+          const parameterMirror = new ParameterMirror();
+          parameterMirror.classMirror = this.classMirror;
+          parameterMirror.index = i;
+          parameterMirror.target = this.target;
+          parameterMirror.propertyKey = null;
+          parameterMirror.methodMirror = this;
+          map.set(i, parameterMirror);
+        });
+        return map;
+      }
+    }
     return new Map(this.parameters.entries());
   }
 
@@ -220,7 +236,20 @@ export class MethodMirror<
   public getParameter<T extends ParameterDecorate = ParameterDecorate>(
     index: number
   ): ParameterMirror<T> {
-    return this.parameters.get(index) as ParameterMirror<T>;
+    const { parameters } = this;
+    if (parameters.size === 0) {
+      const designParamTypes = this.getDesignParamTypes();
+      if (designParamTypes && designParamTypes[index]) {
+        const parameterMirror = new ParameterMirror();
+        parameterMirror.classMirror = this.classMirror;
+        parameterMirror.index = index;
+        parameterMirror.target = this.target;
+        parameterMirror.propertyKey = null;
+        parameterMirror.methodMirror = this;
+        return parameterMirror as ParameterMirror<T>;
+      }
+    }
+    return parameters.get(index) as ParameterMirror<T>;
   }
 
   /**

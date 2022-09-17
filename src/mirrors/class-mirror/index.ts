@@ -156,6 +156,14 @@ export class ClassMirror<
           parameterMirror.index = i;
           parameterMirror.target = this.target;
           parameterMirror.propertyKey = null;
+          const methodMirror = new MethodMirror();
+          methodMirror.classMirror = this;
+          methodMirror.isStatic = false;
+          methodMirror.descriptor = Object.getOwnPropertyDescriptors(
+            this.target
+          );
+          methodMirror.propertyKey = 'constructor';
+          parameterMirror.methodMirror = methodMirror;
           parameterMirror.methodMirror = null;
           map.set(i, parameterMirror);
         });
@@ -172,7 +180,25 @@ export class ClassMirror<
   public getParameter<T extends ParameterDecorate>(
     index: number
   ): ParameterMirror<T> {
-    return this.parameters.get(index) as ParameterMirror<T>;
+    const { parameters } = this;
+    if (parameters.size === 0) {
+      const designParamTypes = this.getDesignParamTypes();
+      if (designParamTypes && designParamTypes[index]) {
+        const parameterMirror = new ParameterMirror();
+        parameterMirror.classMirror = this;
+        parameterMirror.index = index;
+        parameterMirror.target = this.target;
+        parameterMirror.propertyKey = null;
+        const methodMirror = new MethodMirror();
+        methodMirror.classMirror = this;
+        methodMirror.isStatic = false;
+        methodMirror.descriptor = Object.getOwnPropertyDescriptors(this.target);
+        methodMirror.propertyKey = 'constructor';
+        parameterMirror.methodMirror = methodMirror;
+        return parameterMirror as ParameterMirror<T>;
+      }
+    }
+    return parameters.get(index) as ParameterMirror<T>;
   }
 
   /**
